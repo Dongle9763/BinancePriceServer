@@ -1,27 +1,29 @@
 import WebSocket from 'ws'
+import type { BinanceTradeMessage } from '../types/binance-trade-message.js';
+import { getPrice, setPrice } from '../price/price-store.js';
 
 export const connectBinanceTrade = (symbol: string) => {
     const ws = new WebSocket(
         `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@trade`
     );
 
-    let lastPrice: string | undefined;
-
     ws.on(`open`, () => {
         console.log(`${symbol} Binance WebSocket connected`);
     });
 
     ws.on(`message`, (data) => {
-        const message = JSON.parse(data.toString());
+        const message: BinanceTradeMessage = JSON.parse(data.toString());
 
-        lastPrice = message.p;
+        setPrice(message.s, message.p);
     });
 
     setInterval(() => {
-        if(lastPrice !== undefined){
-            console.log(`${symbol.toUpperCase()} : ${lastPrice}`)
+        const price = getPrice(symbol);
+
+        if (price !== undefined) {
+            console.log(`${symbol.toUpperCase()} : ${price}`)
         }
-    }, 1000);
+    }, 10000);
 
     ws.on(`error`, (error) => {
         console.error(`${symbol} WebSocket Error:`, error);
