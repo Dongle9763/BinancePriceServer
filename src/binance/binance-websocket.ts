@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 
-const connectBinanceTrade = (symbol: string) => {
+export const connectBinanceTrade = (symbol: string) => {
     const ws = new WebSocket(
         `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@trade`
     );
@@ -31,6 +31,3 @@ const connectBinanceTrade = (symbol: string) => {
         console.log(`${symbol} WebSocket Close`);
     });
 };
-
-connectBinanceTrade('btcusdt');
-connectBinanceTrade('ethusdt');
